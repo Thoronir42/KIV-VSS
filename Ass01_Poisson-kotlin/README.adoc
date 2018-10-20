@@ -1,0 +1,114 @@
+= Random number generation
+Štěpán Ševčík <kiwi@students.zcu.cz> 
+v1.0 20.10.2018
+:doctype: book
+:compat-mode!:
+:nofooter:
+
+*KIV/VSS Semester assignment 01*
+
+* Deadline = 23.10.
+* Day of birth = 6
+* (23 + 6) * 3 mod 10 = 7
+
+Problem 7 - Poisson Distribution
+
+Create distribution benchmarking tool with argument-aware CLI.
+Implement estimation of *Expected value* and *Variance* with given arguments.
+Implement random value generator with Poisson distribution behaviour and describe its resulting value sets.
+
+== Poisson distribution
+In probability theory and statistics, the Poisson distribution is a discrete probability distribution that expresses the probability of a given number of events occurring in a fixed interval of time or space if these events occur with a known constant rate and independently of the time since the last event.footnote:[Frank A. Haight (1967). Handbook of the Poisson Distribution. New York: John Wiley & Sons]
+
+A discrete random variable *X*  is said to have a Poisson distribution with parameter *λ* > 0, if, for *k* = _0, 1, 2, ...,_ the probability mass function of X  is given by:footnote:[Probability and Stochastic Processes: A Friendly Introduction for Electrical and Computer Engineers, Roy D. Yates, David Goodman, page 60]
+
+.Probability mass function
+[caption="Figure 1:"]
+image::doc/pmf.svg[width=360px]
+
+=== Distribution generator
+For random value generation an angorithm 'Poisson generator based upon the inversion by sequential search' footnote:[https://en.wikipedia.org/wiki/Poisson_distribution#Generating_Poisson-distributed_random_variables] was used. Its main advantage is that for each Poisson distribution value it uses only one normalized uniform value from the random value source.
+
+[unbreakable]
+```
+algorithm Poisson generator based upon the inversion by sequential search:
+    init:
+         Let x ← 0, p ← e−λ, s ← p.
+         Generate uniform random number u in [0,1].
+    while u > s do:
+         x ← x + 1.
+         p ← p * λ / x.
+         s ← s + p.
+    return x.
+```
+
+<<<
+== Implementation
+Kotlin was used to realize the implementation of this excersise. It is possible to compile the code through the command line according to the https://kotlinlang.org/docs/tutorials/command-line.html[official resources], although I reccomend using IDEA.
+
+NOTE: JDK v1.8 is used as 1.7 is no longer officially distributed. JRE 1.8 is required 
+
+The implementation consists benchmarking classes used for the core functionality and CLI wrapper supporting several options.
+Base functionality can be examined by running following command: `run.bat (measures) (lambda)`.
+
+The program prints extensive usage help if run by `run.bat -h`.
+
+=== Example output
+If the program is run with parameters:
+
+* measure count = 5000,
+* lambda = 20,
+* seed = 39,
+* histogram interval count = 10,
+* histogram collapse = 32
+
+it gives following output.
+```
+D:\Poisson>run.bat 5000 20 -hi 10 -hc 32 -s 39
+E_teorie=20.0
+D_teorie=20.0
+E_vypocet=20.0136
+D_vypocet=20.405815040000146
+
+[  27] -  6,00 -  9,10:
+[ 162] -  9,10 - 12,20: *****
+[ 591] - 12,20 - 15,30: ******************
+[1144] - 15,30 - 18,40: ***********************************
+[1273] - 18,40 - 21,50: ***************************************
+[ 999] - 21,50 - 24,60: *******************************
+[ 523] - 24,60 - 27,70: ****************
+[ 204] - 27,70 - 30,80: ******
+[  64] - 30,80 - 33,90: **
+[  12] - 33,90 - 37,00:
+[   1] - 37,00 - 40,10:
+```
+
+Here we can see the expected *mean value* and *variance* to equal provided lambda. The actual values are closely approaching the expected ones, which is caused due to the low amount of data points.
+
+<<<
+=== Default output
+If the program is run without arguments, it simulates as if it was run with following arguments:
+
+* `run.bat 1000 96 -s 420 -hi 20`
+* `run.bat 1000000 96 -s 420 -hi 20`
+
+The results given are in order, ommitting histogram:
+```
+E_teorie=96.0
+D_teorie=96.0
+E_vypocet=96.352
+D_vypocet=88.4740959999999
+```
+and
+```
+E_teorie=96.0
+D_teorie=96.0
+E_vypocet=95.990987
+D_vypocet=95.9859357658493
+```
+Here we can see that in first case, the variance does not correspond too well to the expected value due to the high lambda, which results in a broader value range. The variance "does not get enough attempts" to converge to the actual value.
+
+Same seed with 1,000,000 measures, instead of 1,000, produces values which all-together trace the expected values way tighter.
+
+== Conclusion
+The benchmarking tool developed describes Poisson distribution which describes an event occurrence in given time range. In this article we examined how amount of measures affect our perception of random value characteristics. If not enough amount of data is provided, the variable characteristics might be difficult to describe / model.

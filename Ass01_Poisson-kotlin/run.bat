@@ -1,0 +1,1 @@
+java -jar Ass01_Poisson-kotlin.jar %*

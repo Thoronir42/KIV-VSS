@@ -1,6 +1,8 @@
 package cz.zcu.students.kiwi
 
-import cz.zcu.students.kiwi.cli.*
+import cz.zcu.students.kiwi.cli.CLI
+import cz.zcu.students.kiwi.cli.CLIException
+import cz.zcu.students.kiwi.cli.PrintUsageException
 import cz.zcu.students.kiwi.vss.random.stats.Histogram
 import cz.zcu.students.kiwi.vss.random.stats.RandValDistributionStats
 import cz.zcu.students.kiwi.vss.random.stats.RandomValueStats
@@ -11,7 +13,6 @@ fun main(args: Array<String>) {
     if (args.isEmpty()) {
         mainRun("1000", "96", "-s", "420", "-hi", "20")
         mainRun("1000000", "96", "-s", "420", "-hi", "20", "-hc", "1000")
-//        mainRun("100000", "72")
     } else {
         mainRun(*args)
     }
@@ -35,7 +36,7 @@ fun mainRun(vararg args: String) {
     try {
         cliParsed = cli.parse(*args)
     } catch (ex: CLIException) {
-        if(ex is PrintUsageException) {
+        if (ex is PrintUsageException) {
             cli.printUsage(System.out)
         } else {
             System.err.println(ex.toString())
