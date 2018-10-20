@@ -1,6 +1,6 @@
 package cz.zcu.students.kiwi.vss.random.stats
 
-class Histogram(val min: Double, val max: Double) {
+class Histogram(private val min: Double, val max: Double) {
     private var intervals: Array<Int> = Array(0) { 0 }
     private var intervalSize: Double = 0.0
 
@@ -16,14 +16,10 @@ class Histogram(val min: Double, val max: Double) {
         return this
     }
 
-    fun size() = this.intervals.size
-
-    fun intervalSize() = this.intervalSize
-
     fun intervals() = this.intervals
 
     fun everyInterval(callback: (Double, Double, Int) -> Unit) {
-        for (i in 0 until size()) {
+        for (i in 0 until this.intervals.size) {
             val start = min + intervalSize * i
             val end = start + intervalSize
             callback(start, end, intervals[i])

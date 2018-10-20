@@ -1,7 +1,6 @@
-package cz.zcu.students.kiwi.vss
+package cz.zcu.students.kiwi
 
-import cli.CLIException
-import cli.PrintUsageException
+import cz.zcu.students.kiwi.cli.*
 import cz.zcu.students.kiwi.vss.random.stats.Histogram
 import cz.zcu.students.kiwi.vss.random.stats.RandValDistributionStats
 import cz.zcu.students.kiwi.vss.random.stats.RandomValueStats
@@ -18,7 +17,7 @@ fun main(args: Array<String>) {
     }
 }
 
-private fun CLI(): CLI {
+private fun cli(): CLI {
     val cli = CLI("evalPoisson")
     cli.arg("measures", true)
     cli.arg("lambda", true, "Expected value of Poisson Distribution")
@@ -30,8 +29,8 @@ private fun CLI(): CLI {
 }
 
 fun mainRun(vararg args: String) {
-    // process CLI
-    val cli = CLI()
+    // process cli
+    val cli = cli()
     val cliParsed: CLI.Parsed
     try {
         cliParsed = cli.parse(*args)

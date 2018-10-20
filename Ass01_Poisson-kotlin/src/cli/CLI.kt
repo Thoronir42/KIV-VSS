@@ -1,7 +1,5 @@
-package cz.zcu.students.kiwi.vss
+package cz.zcu.students.kiwi.cli
 
-import cli.CLIException
-import cli.PrintUsageException
 import java.io.PrintStream
 import java.util.*
 
@@ -100,7 +98,7 @@ class CLI(private val name: String = "Program") {
 
         operator fun get(a: Int) = arguments[a]
 
-        fun option(name: String): Array<String>? = this.options[name]
+        private fun option(name: String): Array<String>? = this.options[name]
 
         fun optionInt(name: String, default: Int = 0): Int {
             val opt = this.option(name)

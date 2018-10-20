@@ -1,4 +1,4 @@
-package cz.zcu.students.kiwi.vss.random.value;
+package cz.zcu.students.kiwi.vss.random.value
 
 import cz.zcu.students.kiwi.vss.random.stats.RandValDistributionStats
 
