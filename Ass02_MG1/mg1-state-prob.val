@@ -1,0 +1,12 @@
+load "mg1" as buf
+
+define LQ := 1;
+define steps := 2;
+
+select 
+  i as Reqs,
+  j as Step,
+  sum(p[i,j]) as Lw
+from buf
+  for i := 0 to LQ+1, j := 0 to steps - 1
+where not (i = 0 and j = 1)

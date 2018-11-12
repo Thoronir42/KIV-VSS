@@ -1,0 +1,118 @@
+= Markov modelling
+Štěpán Ševčík <kiwi@students.zcu.cz> 
+v1.0 06.11.2018
+:doctype: book
+:compat-mode!:
+:nofooter:
+
+*KIV/VSS Semester assignment 02*
+
+* Deadline = 6.11. (calc 30.10.)
+* Day of birth = 6
+* (30 + 6) * 3 mod 10 = 8
+
+Problem 8 - M/G/1 System with Lq=1 with 2-phase request handling
+
+= Problem description =
+We have frequently discharging remote controllers, with frequency of discharge: `λ = 1 [minute^-1^]`. All controllers take 2 AA sized batteries and on average, we are able to replace a battery in controller with frequency of `μ = 2 [minute^-1^]`.
+While we are processing a controller, we are able to queue up to one additional controller for battery replacement.
+
+NOTE: Model simplifies most of the logistics and omits manipulation duration.
+
+== State diagram
+
+State diagram vizualizes possible states in which our system can reside in.
+In this diagram, there is also a virtual state cluster which visualizes possible state domain extension by prolonging queue.
+These states however will not be considered in calculations.
+
+.Remote controller battery changing state diagram
+[caption="Figure 1:"]
+image::01_state.png[width=360px]
+
+Each state is represented by a node labeled by a pair of state information. The left side represents amount of requests (controllers) in system and right side represents of process-status of current request (batteries replaced).
+
+== State probability values
+We can calculate the limit probability value for each state by summing probabilities of entering and remaining the state. The system of equation for each state probability is as follows:
+
+* Empty system +
+`p~e,0~ = p~e,0~ - p~e,0~ * λ + p~1,1~ * μ`
+* One request +
+`p~1,0~ = p~1,0~ - p~1,0~ * (λ + μ) + p~e,0~ * λ + p~2,1~ * μ` +
+`p~1,1~ = p~1,1~ - p~1,1~ * (λ + μ) + p~e,0~ * λ + p~1,1~ * μ`
+* Two requests +
+`p~2,0~ = p~2,0~ - p~2,0~ * λ + p~1,0~ * λ` +
+`p~2,1~ = p~2,1~ - p~2,1~ * μ + p~2,0~ * μ + p~1,1~ * λ`
+
+=== Markov2
+The actual calculations were executed by the Markov2 program, which takes markov model as an input and allows to be execute various queries over it footnote:[M. Paška - Spolehlivostní modelování pohotových systémů, Diploma thesis, 2006].
+
+Our system is modelled and queried by structures included in *Appendix 1* and the limit probability values of individual states are as follows:
+```
+ Reqs  Step  P(req,step)
+    0     0  0.285714 
+    1     0  0.214286 
+    1     1  0.142857 
+    2     0  0.178571 
+    2     1  0.178571 
+```
+
+== Additional queries
+
+The mean interval of empty system is equal to `1/P~0,0~`. That means approximately every 3.5 minutes the system is empty.
+
+The probability of system containing exactly one request is equal to `P~1,0~ + P~1,1~`, which according to Markov2 query evaluates to 0.357143.
+
+<<<
+
+= Appendix 1 - Markov2
+Our system model specifications for the program is as follows:
+
+```
+module kiwimg1 [3,2];
+#define LQ 1
+#define λ 1.0
+#define μ 2.0
+
+[0,0]->λ [1,0];
+[1,0]->μ [1,1];
+[1,1]->μ [0,0];
+
+for(i; 1; LQ) {
+  [i,0]->λ [i+1,0];
+  [i,1]->λ [i+1,0];
+  [i+1,0]->μ [i+1,1];
+  [i+1,1]->μ [i,0];
+}
+```
+
+== Query for limit probability values of individual states
+```
+load "mg1" as buf
+
+define LQ := 1;
+define steps := 2;
+
+select 
+  i as Reqs,
+  j as Step,
+  sum(p[i,j]) as pReqStep
+from buf
+  for i := 0 to LQ+1, j := 0 to steps - 1
+where not (i = 0 and j = 1)
+```
+
+== Query: Probability of L~q~ = 1
+```
+load "mg1" as buf
+
+define LQ := 1;
+define steps := 2;
+
+select 
+  i as Reqs,
+  sum(p[i,j]) as pReqStep
+from buf
+  for i := 0 to LQ+1, j := 0 to steps - 1
+where i = 1
+group 1
+```

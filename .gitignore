@@ -1,2 +1,9 @@
 */out
 *.iml
+
+*.pdf
+*.jar
+*.zip
+*.MF
+
+Ass02_MG1/*.png

@@ -1,0 +1,45 @@
+digraph G {
+    rankdir = "TB";
+    splines="TRUE";
+
+    node [shape=Mrecord]
+
+    subgraph cluster_0 {
+        p_e [label="e|0"]
+    }
+
+    subgraph cluster_1 {
+
+        p_1_0 [label="1|0"]
+        p_1_1 [label="1|1"]
+
+        p_e -> p_1_0 [label="λ"]
+        p_1_0 -> p_1_1 [label="μ"]
+        p_1_1 -> p_e [label="μ"]
+    }
+    
+    subgraph cluster_2 {
+        p_2_0 [label="2|0"]
+        p_2_1 [label="2|1"]
+
+        p_1_0 -> p_2_0 [label="λ"]
+        p_1_1 -> p_2_1 [label="λ"]
+        p_2_0 -> p_2_1 [label="μ"]
+        p_2_1 -> p_1_0 [label="μ"]
+    }
+
+    subgraph cluster_N {
+        color=lightgrey
+        node [color=lightgrey]
+        edge [color=lightgrey]
+        
+        p_no [label="X|0"]
+        p_ni [label="X|1"]
+
+        p_2_0 -> p_no [label="λ"]
+        p_2_1 -> p_ni [label="λ"]
+        p_ni -> p_2_0 [label="μ"]
+        p_no-> p_ni [label="μ"]
+    }
+
+}
